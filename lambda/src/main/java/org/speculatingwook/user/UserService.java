@@ -4,7 +4,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserService {
     private List<User> users = new ArrayList<>();
@@ -82,7 +84,9 @@ public class UserService {
      * @return 나이 범위 내의 사용자 목록
      */
     public List<User> getUsersInAgeRange(int minAge, int maxAge) {
-        return null;
+        return users.stream()
+                .filter(u -> minAge <=u.getAge() &&u.getAge()<=maxAge)
+                .toList();
     }
 
     /**
@@ -91,7 +95,9 @@ public class UserService {
      * @return 이름이 일치하는 사용자
      */
     public Optional<User> findUserByName(String name) {
-        return null;
+        return users.stream()
+                .filter(u-> u.getName().equals(name))
+                .findAny();
     }
 
     /**
@@ -100,7 +106,8 @@ public class UserService {
      * @return 모든 사용자가 해당 나이 이상이면 true, 아니면 false
      */
     public boolean areAllUsersAboveAge(int age) {
-        return false;
+        return users.stream()
+                .allMatch(u->u.getAge()>=age);
     }
 
     /**
@@ -109,7 +116,9 @@ public class UserService {
      * @return 조건에 맞는 사용자
      */
     public Optional<User> findUser(Predicate<User> predicate) {
-        return null;
+        return users.stream()
+                .filter(predicate)
+                .findAny();
     }
 
     /**
@@ -117,7 +126,13 @@ public class UserService {
      * @return 부서별 가장 나이 많은 사용자
      */
     public Map<String, User> getOldestUserByDepartment() {
-        return null;
+
+        return users.stream()
+                .collect(Collectors.toMap(
+                        User::getDepartment,
+                        u -> u,
+                        (u1, u2) -> u1.getAge() > u2.getAge() ? u1 : u2
+                ));
     }
 
     /**
@@ -125,7 +140,9 @@ public class UserService {
      * @return 이름이 가장 긴 사용자
      */
     public Optional<User> getUserWithLongestName() {
-        return null;
+
+        return users.stream()
+                .max(Comparator.comparingInt(u -> u.getName().length()));
     }
 
     /**
@@ -134,7 +151,10 @@ public class UserService {
      * @return 대문자로 변환된 사용자 이름 목록
      */
     public List<String> getUpperCaseNamesOfUsersAboveAge(int age) {
-        return null;
+        return users.stream() // 특정 나이 이상 -> 특정 나이 초과 ! 문구 수정 필요
+                .filter(u -> u.getAge() > age)
+                .map(u -> u.getName().toUpperCase())
+                .toList();
     }
 
     /**
@@ -144,7 +164,9 @@ public class UserService {
      * @return 변환된 사용자 목록
      */
     public <R> List<R> mapUsers(Function<User, R> mapper) {
-        return null;
+        return users.stream()
+                .map(mapper)
+                .toList();
     }
 
     /**
@@ -152,7 +174,9 @@ public class UserService {
      * @return 연결된 사용자 이름 문자열
      */
     public String getAllUserNamesToString() {
-        return null;
+        return users.stream()
+                .map(User::getName)
+                .collect(Collectors.joining(", "));
     }
 
     /**
@@ -160,7 +184,12 @@ public class UserService {
      * @return 부서별 평균 나이
      */
     public Map<String, Double> getAverageAgeByDepartment() {
-        return null;
+
+        return users.stream()
+                .collect(Collectors.groupingBy(
+                        User::getDepartment,
+                        Collectors.averagingInt(User::getAge)
+                ));
     }
 
     /**
@@ -168,7 +197,11 @@ public class UserService {
      * @return 정렬된 부서 목록과 평균 나이
      */
     public List<Map.Entry<String, Double>> getDepartmentsSortedByAverageAge() {
-        return null;
+
+        return getAverageAgeByDepartment().entrySet()
+                .stream()
+                .sorted(Comparator.comparingDouble(Map.Entry<String, Double>::getValue).reversed()) // 평균 나이 기준 내림차순 정렬
+                .toList();
     }
 
     /**
@@ -177,7 +210,9 @@ public class UserService {
      * @return 필터링된 사용자 목록
      */
     public List<User> filterUsers_1(Predicate<User> predicate) {
-        return null;
+        return users.stream()
+                .filter(predicate)
+                .toList();
     }
 
     /**
@@ -186,7 +221,9 @@ public class UserService {
      * @return 필터링된 사용자 목록
      */
     public List<User> filterUsers_2(Predicate<User> predicate) {
-        return null;
+        return users.stream()
+                .filter(predicate)
+                .toList();
     }
 
     /**
@@ -194,6 +231,7 @@ public class UserService {
      * @param consumer 작업
      */
     public void processUsers(Consumer<User> consumer) {
+        users.forEach(consumer);
     }
 
     /**
@@ -201,6 +239,7 @@ public class UserService {
      * @param comparator 비교 기준
      */
     public void sortUsers(Comparator<User> comparator) {
+        users.sort(comparator);
     }
 
     /**
@@ -208,7 +247,10 @@ public class UserService {
      * @return 평균 나이
      */
     public double getAverageAge() {
-        return 0;
+        return users.stream()
+                .mapToInt(User::getAge)
+                .average()
+                .orElse(0.0);
     }
 
     /**
