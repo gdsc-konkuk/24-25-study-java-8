@@ -112,8 +112,6 @@ public class LibraryService {
                     return true;
                 })
                 .orElse(false);
-
-
     }
 
     /**
@@ -145,7 +143,11 @@ public class LibraryService {
      */
     public String getMostProlificAuthor() {
 
-        return "";
+
+        return groupBooksByAuthor().entrySet().stream()
+                .max(Comparator.comparing(b->b.getValue().size()))
+                .map(Map.Entry::getKey)
+                .orElse("");
     }
 
 
@@ -156,9 +158,8 @@ public class LibraryService {
      */
     public int getTotalTitleLength() {
         return books.stream()
-                .map(Book::getTitle)
-                .collect(Collectors.joining())
-                .length();
+                .mapToInt(b -> b.getTitle().length())
+                .reduce(0, (a,b)-> a + b);
     }
 
     /**
