@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class UserService {
     private List<User> users = new ArrayList<>();
@@ -17,7 +18,9 @@ public class UserService {
      * @return 사용자 이름 목록
      */
     public List<String> getAllUserNames() {
-        return null;
+        return users.stream()
+                .map(User::getName)
+                .toList();
     }
 
     /**
@@ -25,7 +28,9 @@ public class UserService {
      * @return 나이순으로 정렬된 사용자 목록
      */
     public List<User> getUsersSortedByAge() {
-        return null;
+        return users.stream()
+                .sorted(Comparator.comparingInt(User::getAge))
+                .toList();
     }
 
     /**
@@ -33,7 +38,9 @@ public class UserService {
      * @return 나이가 30 이상인 사용자 목록
      */
     public List<User> getUsersOver30() {
-        return null;
+        return users.stream()
+                .filter( u -> u.getAge() >=30)
+                .toList();
     }
 
     /**
@@ -41,7 +48,9 @@ public class UserService {
      * @return 부서별 사용자 목록
      */
     public Map<String, List<User>> groupUsersByDepartment() {
-        return null;
+
+        return users.stream()
+                .collect(Collectors.groupingBy(User::getDepartment));
     }
 
     /**
@@ -49,7 +58,10 @@ public class UserService {
      * @return 사용자 나이 합
      */
     public int getTotalAge() {
-        return 0;
+
+        return users.stream()
+                .mapToInt(User::getAge)
+                .sum();
     }
 
     /**
@@ -57,7 +69,10 @@ public class UserService {
      * @return 평균 급여
      */
     public double getAverageSalary() {
-        return 0;
+        return users.stream()
+                .mapToDouble(User::getSalary)
+                .average()
+                .orElse(0.0);
     }
 
     /**
