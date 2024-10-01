@@ -133,7 +133,9 @@ public class LibraryService {
      * @return 대출 가능 여부에 따른 책들의 맵
      */
     public Map<Boolean, List<Book>> partitionBooksByAvailability() {
-        return null;
+
+        return books.stream()
+                .collect(Collectors.partitioningBy(Book::isAvailable));
     }
 
     /**
@@ -142,7 +144,8 @@ public class LibraryService {
      * @return 가장 많은 책을 출판한 저자
      */
     public String getMostProlificAuthor() {
-        return null;
+
+        return "";
     }
 
 
@@ -152,7 +155,10 @@ public class LibraryService {
      * @return 책 제목의 총 길이
      */
     public int getTotalTitleLength() {
-        return 0;
+        return books.stream()
+                .map(Book::getTitle)
+                .collect(Collectors.joining())
+                .length();
     }
 
     /**
@@ -171,7 +177,9 @@ public class LibraryService {
      * @return 검증된 책 리스트
      */
     public List<Book> getValidBooks(BookValidator validator) {
-        return null;
+        return books.stream()
+                .filter(validator::validate)
+                .toList();
     }
 
     /**
@@ -181,7 +189,9 @@ public class LibraryService {
      * @return 변환된 결과 리스트
      */
     public <T> List<T> transformBooks(BookTransformer<T> transformer) {
-        return null;
+        return books.stream()
+                .map(transformer::transform)
+                .toList();
     }
 
     /**
@@ -189,7 +199,7 @@ public class LibraryService {
      * @param bookSupplier 새 책을 생성할 Supplier
      */
     public void addNewBook(Supplier<Book> bookSupplier) {
-
+        books.add(bookSupplier.get());
     }
 
     /**
@@ -198,7 +208,9 @@ public class LibraryService {
      * @return 찾은 책 (Optional로 감싸진 값)
      */
     public Optional<Book> findBookByIsbn(String isbn) {
-        return null;
+        return books.stream()
+                .filter(b -> b.getIsbn().equals(isbn))
+                .findAny();
     }
 
     /**
@@ -210,7 +222,8 @@ public class LibraryService {
      * @return 비교 결과
      */
     public <T> T compareBooks(Book book1, Book book2, BiFunction<Book, Book, T> comparator) {
-        return null;
+
+        return comparator.apply(book1,book2);
     }
 
     /**
@@ -221,6 +234,7 @@ public class LibraryService {
     public void updateBookState(String isbn, UnaryOperator<Book> updater) {
         findBookByIsbn(isbn).ifPresent(book -> {
             // TODO: 이 부분을 채워주세요
+            Book apply = updater.apply(book);
         });
     }
 
