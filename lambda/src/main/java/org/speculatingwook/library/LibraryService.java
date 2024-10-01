@@ -4,11 +4,18 @@ import org.speculatingwook.library.book.BookProcessor;
 import org.speculatingwook.library.book.BookTransformer;
 import org.speculatingwook.library.book.BookValidator;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+
+import static java.time.temporal.ChronoField.EPOCH_DAY;
+import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 
 public class LibraryService {
     private List<Book> books = new ArrayList<>();
@@ -24,7 +31,9 @@ public class LibraryService {
      * @return 조건에 맞는 책들의 리스트
      */
     public List<Book> findBooks(Predicate<Book> predicate) {
-        return null;
+        return books.stream()
+                .filter(predicate)
+                .toList();
     }
 
 
@@ -33,7 +42,8 @@ public class LibraryService {
      * @return 저자별 책 리스트 맵
      */
     public Map<String, List<Book>> groupBooksByAuthor() {
-        return null;
+        return books.stream()
+                .collect(Collectors.groupingBy(Book::getAuthor));
     }
 
     /**
@@ -42,7 +52,10 @@ public class LibraryService {
      * @return 카테고리별 책의 개수
      */
     public Map<String, Long> countBooksByCategory() {
-        return null;
+        return books.stream()
+                .map(Book::getCategories)
+                .flatMap(List::stream)
+                .collect(Collectors.groupingBy(c->c ,Collectors.counting()));
     }
 
     /**
@@ -52,7 +65,11 @@ public class LibraryService {
      * @return 인기 카테고리 리스트
      */
     public List<String> getMostPopularCategories(int n) {
-        return null;
+        return countBooksByCategory().entrySet().stream()
+                .sorted(Comparator.comparingLong(Map.Entry<String, Long>::getValue).reversed())
+                .map(Map.Entry::getKey)
+                .limit(n)
+                .toList();
     }
 
     /**
@@ -61,7 +78,10 @@ public class LibraryService {
      * @return 평균 책 나이
      */
     public double getAverageBookAge() {
-        return 0;
+        return books.stream()
+                .mapToLong(b -> ChronoUnit.YEARS.between(b.getPublishDate(), LocalDate.now()))
+                .average()
+                .orElse(0.0);
     }
 
     /**
@@ -71,7 +91,10 @@ public class LibraryService {
      * @return 최근 책들의 리스트
      */
     public List<Book> getRecentBooks(int n) {
-        return null;
+        return books.stream()
+                .sorted(Comparator.comparing(Book::getPublishDate).reversed())
+                .limit(n)
+                .toList();
     }
 
     /**
@@ -80,7 +103,17 @@ public class LibraryService {
      * @return 대출 성공 여부
      */
     public boolean lendBook(String isbn) {
-        return false;
+        return books.stream()
+                .filter(b -> b.getIsbn().equals(isbn))
+                .filter(Book::isAvailable)
+                .findFirst()
+                .map(b -> {
+                    b.setAvailable(false);
+                    return true;
+                })
+                .orElse(false);
+
+
     }
 
     /**
@@ -88,7 +121,11 @@ public class LibraryService {
      * @param isbn 반납할 책의 ISBN 번호
      */
     public void returnBook(String isbn) {
-
+        books.stream()
+                .filter(b -> b.getIsbn().equals(isbn))
+                .filter(b -> !b.isAvailable())
+                .findFirst()
+                .ifPresent(b -> b.setAvailable(true));
     }
 
     /**
@@ -122,7 +159,8 @@ public class LibraryService {
      * 11. 커스텀 BookProcessor를 사용하여 책을 처리합니다.
      * @param processor 책을 처리할 프로세서
      */
-    public void processBooks(BookProcessor processor) {
+    public void processBooks(BookProcessor processor)
+    {
         books.forEach(processor::process);
     }
 
