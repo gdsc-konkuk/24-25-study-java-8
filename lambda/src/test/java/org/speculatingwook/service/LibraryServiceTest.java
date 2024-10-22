@@ -9,6 +9,8 @@ import org.speculatingwook.library.Book;
 import org.speculatingwook.library.LibraryService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -127,7 +129,7 @@ public class LibraryServiceTest {
     public void testProcessBooks() {
         final int[] count = {0};
         BookProcessor countProcessor = book -> {
-            // TODO: 이 부분을 완성하세요.
+            count[0]++;
         };
         libraryService.processBooks(countProcessor);
         assertEquals(5, count[0]);
@@ -140,8 +142,7 @@ public class LibraryServiceTest {
     @Test
     public void testGetValidBooks() {
         BookValidator recentBookValidator = book -> {
-            // TODO: 이 부분을 완성하세요.
-            return false; // 이 부분을 적절히 수정하세요.
+            return book.getPublishDate().isAfter(LocalDate.of(1950, 1, 1));
         };
         List<Book> recentBooks = libraryService.getValidBooks(recentBookValidator);
         assertEquals(1, recentBooks.size());
@@ -151,7 +152,7 @@ public class LibraryServiceTest {
     @Test
     public void testTransformBooks() {
         BookTransformer<String> titleTransformer = book -> {
-            return ""; // 이 부분을 적절히 수정하세요.
+            return book.getTitle();
         };
         List<String> titles = libraryService.transformBooks(titleTransformer);
         assertEquals(Arrays.asList("1984", "To Kill a Mockingbird", "The Great Gatsby", "Animal Farm", "Brave New World"), titles);
@@ -168,8 +169,12 @@ public class LibraryServiceTest {
     @Test
     public void testAddNewBook() {
         Supplier<Book> newBookSupplier = () -> {
-            // TODO: 이 부분을 완성하세요.
-            return null; // 이 부분을 적절히 수정하세요.
+            String title="The Catcher in the Rye";
+            String author="J.D. Salinger";
+            LocalDate date=LocalDate.of(1951, 7, 16);
+            List<String> list = List.of("Coming-of-age", "Realistic fiction");
+            Book book=new Book(title,author,"123",date,list);
+            return book; // 이 부분을 적절히 수정하세요.
         };
         libraryService.addNewBook(newBookSupplier);
         assertEquals(6, libraryService.findBooks(book -> true).size());
@@ -181,7 +186,7 @@ public class LibraryServiceTest {
         Book book1 = libraryService.findBookByIsbn("1234").orElseThrow();
         Book book2 = libraryService.findBookByIsbn("5678").orElseThrow();
         BiFunction<Book, Book, Boolean> publishDateComparator = (b1, b2) -> {
-            return false; // TODO: 이 부분을 적절히 수정하세요.
+            return b2.getPublishDate().isAfter(b1.getPublishDate());
         };
         assertTrue(libraryService.compareBooks(book1, book2, publishDateComparator));
     }
@@ -190,6 +195,7 @@ public class LibraryServiceTest {
     @Test
     public void testUpdateBookState() {
         UnaryOperator<Book> makeUnavailable = book -> {
+            book.setAvailable(!book.isAvailable());
             return book; // TODO: 이 부분을 적절히 수정하세요.
         };
         libraryService.updateBookState("1234", makeUnavailable);
