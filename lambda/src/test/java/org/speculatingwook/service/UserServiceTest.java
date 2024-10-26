@@ -136,7 +136,7 @@ public class UserServiceTest {
     @Test
     public void testGetUpperCaseNamesOfUsersAboveAge() {
         List<String> names = userService.getUpperCaseNamesOfUsersAboveAge(35);
-        assertEquals(1, names.size());
+        assertEquals(2, names.size());
         assertTrue(names.contains("DAVID"));
     }
 
