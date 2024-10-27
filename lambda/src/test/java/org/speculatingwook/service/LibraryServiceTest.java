@@ -10,6 +10,7 @@ import org.speculatingwook.library.LibraryService;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -123,14 +124,17 @@ public class LibraryServiceTest {
     }
 
     // 11
+    // 주석에 설명 필요할듯. 만들땐 몰랐는데 지금 보니 countProcessor를 보지 못하면 문제를 풀 수가 없음
+    // 그리고 문제가 설명이 필요할듯. 결론: 잘못 만듬
     @Test
     public void testProcessBooks() {
-        final int[] count = {0};
+        AtomicInteger count = new AtomicInteger();
         BookProcessor countProcessor = book -> {
             // TODO: 이 부분을 완성하세요.
+            count.getAndIncrement();
         };
         libraryService.processBooks(countProcessor);
-        assertEquals(5, count[0]);
+        assertEquals(5, count.get());
     }
 
     /**
@@ -141,7 +145,7 @@ public class LibraryServiceTest {
     public void testGetValidBooks() {
         BookValidator recentBookValidator = book -> {
             // TODO: 이 부분을 완성하세요.
-            return false; // 이 부분을 적절히 수정하세요.
+            return book.getPublishDate().isAfter(LocalDate.of(1950,1,1)); // 이 부분을 적절히 수정하세요.
         };
         List<Book> recentBooks = libraryService.getValidBooks(recentBookValidator);
         assertEquals(1, recentBooks.size());
@@ -150,9 +154,8 @@ public class LibraryServiceTest {
     // 13
     @Test
     public void testTransformBooks() {
-        BookTransformer<String> titleTransformer = book -> {
-            return ""; // 이 부분을 적절히 수정하세요.
-        };
+        // 이 부분을 적절히 수정하세요.
+        BookTransformer<String> titleTransformer = Book::getTitle;
         List<String> titles = libraryService.transformBooks(titleTransformer);
         assertEquals(Arrays.asList("1984", "To Kill a Mockingbird", "The Great Gatsby", "Animal Farm", "Brave New World"), titles);
     }
@@ -165,11 +168,12 @@ public class LibraryServiceTest {
      * categories: Coming-of-age, Realistic fiction
      * 위 책을 추가해야 합니다.
      */
+    // 테스트가 너무 별로임. Supplier가 실제로 쓰일 수 있는 경우(함수 파라미터화) 등을 써주는 게 좀 더 실용적일 듯
     @Test
     public void testAddNewBook() {
         Supplier<Book> newBookSupplier = () -> {
             // TODO: 이 부분을 완성하세요.
-            return null; // 이 부분을 적절히 수정하세요.
+            return new Book("The Catcher in the Rye", "J.D. Salinger","1234", LocalDate.of(1951, 7, 16), List.of("Coming-of-age", "Realistic fiction")); // 이 부분을 적절히 수정하세요.
         };
         libraryService.addNewBook(newBookSupplier);
         assertEquals(6, libraryService.findBooks(book -> true).size());
@@ -181,9 +185,9 @@ public class LibraryServiceTest {
         Book book1 = libraryService.findBookByIsbn("1234").orElseThrow();
         Book book2 = libraryService.findBookByIsbn("5678").orElseThrow();
         BiFunction<Book, Book, Boolean> publishDateComparator = (b1, b2) -> {
-            return false; // TODO: 이 부분을 적절히 수정하세요.
+            return book1.getIsbn().equals(book2.getIsbn()); // TODO: 이 부분을 적절히 수정하세요.
         };
-        assertTrue(libraryService.compareBooks(book1, book2, publishDateComparator));
+        assertFalse(libraryService.compareBooks(book1, book2, publishDateComparator));
     }
 
     // 16
