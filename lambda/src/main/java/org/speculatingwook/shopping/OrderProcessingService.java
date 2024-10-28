@@ -16,7 +16,10 @@ public class OrderProcessingService {
 
     // 주문 총액이 특정 금액 이상인 주문들을 찾습니다.
     public List<Order> findHighValueOrders(double minTotal) {
-        return null;
+
+        return orders.stream()
+                .filter(order -> order.getTotalPrice() >= minTotal)
+                .toList();
     }
 
     // 각 고객별 총 주문 금액을 계산합니다.
