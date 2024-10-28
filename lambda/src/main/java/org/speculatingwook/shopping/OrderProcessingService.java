@@ -6,6 +6,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 public class OrderProcessingService {
     private List<Order> orders = new ArrayList<>();
@@ -16,7 +19,6 @@ public class OrderProcessingService {
 
     // 주문 총액이 특정 금액 이상인 주문들을 찾습니다.
     public List<Order> findHighValueOrders(double minTotal) {
-
         return orders.stream()
                 .filter(order -> order.getTotalPrice() >= minTotal)
                 .toList();
@@ -24,7 +26,10 @@ public class OrderProcessingService {
 
     // 각 고객별 총 주문 금액을 계산합니다.
     public Map<String, Double> calculateTotalOrderValuePerCustomer() {
-        return null;
+
+        return orders.stream()
+                .collect(Collectors.groupingBy(Order::getCustomerId,
+                        Collectors.summingDouble(Order::getTotalPrice)));
     }
 
     // 가장 많이 주문된 제품을 찾습니다.
