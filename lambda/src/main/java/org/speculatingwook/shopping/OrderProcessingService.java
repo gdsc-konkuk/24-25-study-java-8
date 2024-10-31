@@ -6,9 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 public class OrderProcessingService {
     private List<Order> orders = new ArrayList<>();
@@ -72,7 +70,10 @@ public class OrderProcessingService {
 
     // 각 카테고리별 판매 수량을 계산합니다.
     public Map<String, Long> countSalesByCategory() {
-        return null;
+        return orders.stream()
+                .map(Order::getProducts)
+                .flatMap(Collection::stream)
+                .collect(Collectors.groupingBy(Product::getCategory, Collectors.counting()));
     }
 
     // 주어진 기간 동안 가장 많은 매출을 올린 고객을 찾습니다.
