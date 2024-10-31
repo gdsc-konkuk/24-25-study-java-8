@@ -89,6 +89,8 @@ public class OrderProcessingService {
 
     // 주문들을 특정 기준으로 정렬합니다.
     public List<Order> sortOrders(Comparator<Order> orderComparator) {
-        return null;
+        return orders.stream()
+                .sorted(orderComparator)
+                .toList();
     }
 }
