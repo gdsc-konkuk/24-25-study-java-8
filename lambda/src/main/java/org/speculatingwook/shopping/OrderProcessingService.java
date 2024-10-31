@@ -79,7 +79,13 @@ public class OrderProcessingService {
     // 주어진 기간 동안 가장 많은 매출을 올린 고객을 찾습니다.
     // 질문: String은 이 함수에서 사용하기 좋은 타입인가? 만약 아니라면 어떻게 바꾸는 게 더 좋을까?
     public String findTopCustomer(LocalDate startDate, LocalDate endDate) {
-        return null;
+        return orders.stream()
+                .filter(order -> startDate.minusDays(1).isBefore(order.getOrderDate()) && endDate.plusDays(1).isAfter(order.getOrderDate()))
+                .collect(Collectors.groupingBy(Order::getCustomerId, Collectors.summingDouble(Order::getTotalPrice)))
+                .entrySet().stream()
+                .max(Comparator.comparingDouble(Map.Entry::getValue))
+                .get().getKey();
+
     }
 
     // 모든 주문에 대해 주어진 작업을 수행합니다.
