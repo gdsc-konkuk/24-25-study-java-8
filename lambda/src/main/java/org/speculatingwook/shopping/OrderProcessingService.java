@@ -35,12 +35,22 @@ public class OrderProcessingService {
     // 가장 많이 주문된 제품을 찾습니다.
     // 일단 제대로 된 값이 나올 수 있도록 streamAPI를 사용해서 작성해보자. 이 코드에서 발생할 수 있는 문제가 있을까?
     public Product findMostOrderedProduct() {
-        return null;
+        return orders.stream()
+                .map(Order::getProducts)
+                .flatMap(List::stream)
+                .collect(Collectors.groupingBy(p->p, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Comparator.comparingLong(Map.Entry<Product,Long>::getValue))
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
 
     // 특정 기간 동안의 일일 매출을 계산합니다.
     public Map<LocalDate, Double> calculateDailySales(LocalDate startDate, LocalDate endDate) {
-        return null;
+        return orders.stream()
+                .filter(order -> startDate.minusDays(1).isBefore(order.getOrderDate()) && endDate.plusDays(1).isAfter(order.getOrderDate()))
+                .collect(Collectors.groupingBy(Order::getOrderDate, Collectors.summingDouble(Order::getTotalPrice)));
     }
 
     // 주문 상태를 업데이트합니다.
