@@ -55,12 +55,19 @@ public class OrderProcessingService {
 
     // 주문 상태를 업데이트합니다.
     public void updateOrderStatus(String orderId, UnaryOperator<String> statusUpdater) {
+        orders.stream()
+                .filter( order -> order.getId().equals(orderId))
+                .findAny()
+                .ifPresent( order -> order.setStatus(statusUpdater.apply("It means nothing")));
 
     }
 
     // 조건에 맞는 주문들의 특정 정보를 추출합니다.
     public <T> List<T> extractOrderInfo(Predicate<Order> filter, Function<Order, T> infoExtractor) {
-        return null;
+        return orders.stream()
+                .filter(filter::test)
+                .map(infoExtractor::apply)
+                .toList();
     }
 
     // 각 카테고리별 판매 수량을 계산합니다.
