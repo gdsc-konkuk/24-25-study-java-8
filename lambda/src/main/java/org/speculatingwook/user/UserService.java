@@ -166,7 +166,7 @@ public class UserService {
         return users.stream()
                 .filter(user -> user.getAge() >= age)
                 .map(user -> user.getName().toUpperCase())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
