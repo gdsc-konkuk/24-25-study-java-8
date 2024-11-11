@@ -3,6 +3,8 @@ package org.speculatingwook.shopping;
 import java.time.LocalDate;
 import java.util.List;
 
+import static java.util.stream.Collectors.summingDouble;
+
 public class Order {
     private String id;
     private LocalDate orderDate;
@@ -24,4 +26,9 @@ public class Order {
     public List<Product> getProducts() { return products; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public double getTotal(){
+        return products.stream()
+                .collect(summingDouble(Product::getPrice));
+    }
 }
