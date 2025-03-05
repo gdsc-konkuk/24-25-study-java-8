@@ -33,9 +33,13 @@ git push origin 24YoonByungWook
 ## 1. 람다표현식 / Stream 익숙해지기
 - `lambda` 디렉토리를 확인해보자.
 
-### 미션
-- [ ] [UserServiceTest](/lambda/src/test/java/org/speculatingwook/service/UserServiceTest.java)의 테스트를 모두 통과한다.
-- [ ] [LibraryServiceTest](/lambda/src/test/java/org/speculatingwook/service/LibraryServiceTest.java)의 테스트를 모두 통과한다.
+### 자바 8의 기능 유형별 연습 미션
+- [ ] [MovieServiceTest](/lambda/src/test/java/org/speculatingwook/cinema/MovieServiceTest.java)의 테스트를 모두 통과한다.
+
+### 유형 혼합 미션
+- [ ] [UserServiceTest](/lambda/src/test/java/org/speculatingwook/user/UserServiceTest.java)의 테스트를 모두 통과한다.
+- [ ] [LibraryServiceTest](/lambda/src/test/java/org/speculatingwook/library/LibraryServiceTest.java)의 테스트를 모두 통과한다.
+- [ ] [SongServiceTest](/lambda/src/test/java/org/speculatingwook/music/SongServiceTest.java)의 테스트를 모두 통과한다.
 
 ### 요구사항
 
@@ -55,7 +59,7 @@ git push origin 24YoonByungWook
 ## 2. Optional 클래스
 
 ### 미션
-- [ ] [OrderProcessingServiceTest](/lambda/src/test/java/org/speculatingwook/service/OrderProcessingServiceTest.java)의 테스트를 모두 통과한다.
+- [ ] [OrderProcessingServiceTest](/lambda/src/test/java/org/speculatingwook/shopping/OrderProcessingServiceTest.java)의 테스트를 모두 통과한다.
 
 <details>
 <summary>참고</summary>

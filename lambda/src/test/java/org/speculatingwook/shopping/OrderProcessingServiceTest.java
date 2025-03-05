@@ -1,10 +1,7 @@
-package org.speculatingwook.service;
+package org.speculatingwook.shopping;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.speculatingwook.shopping.Order;
-import org.speculatingwook.shopping.OrderProcessingService;
-import org.speculatingwook.shopping.Product;
 
 import static org.junit.jupiter.api.Assertions.*;
 

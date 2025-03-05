@@ -4,11 +4,13 @@ import org.speculatingwook.library.book.BookProcessor;
 import org.speculatingwook.library.book.BookTransformer;
 import org.speculatingwook.library.book.BookValidator;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 public class LibraryService {
     private List<Book> books = new ArrayList<>();
@@ -17,23 +19,24 @@ public class LibraryService {
         books.add(book);
     }
 
-
     /**
      * 1. 주어진 조건에 맞는 책들을 찾습니다.
      * @param predicate 조건을 검사할 Predicate
      * @return 조건에 맞는 책들의 리스트
      */
     public List<Book> findBooks(Predicate<Book> predicate) {
-        return null;
+        return books.stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
     }
-
 
     /**
      * 2. 저자별로 책을 그룹화합니다.
      * @return 저자별 책 리스트 맵
      */
     public Map<String, List<Book>> groupBooksByAuthor() {
-        return null;
+        return books.stream()
+                .collect(Collectors.groupingBy(Book::getAuthor));
     }
 
     /**
@@ -42,7 +45,9 @@ public class LibraryService {
      * @return 카테고리별 책의 개수
      */
     public Map<String, Long> countBooksByCategory() {
-        return null;
+        return books.stream()
+                .flatMap(book -> book.getCategories().stream())
+                .collect(Collectors.groupingBy(category -> category, Collectors.counting()));
     }
 
     /**
@@ -52,7 +57,15 @@ public class LibraryService {
      * @return 인기 카테고리 리스트
      */
     public List<String> getMostPopularCategories(int n) {
-        return null;
+        return books.stream()
+                .flatMap(book -> book.getCategories().stream())
+                .collect(Collectors.groupingBy(category -> category, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .map(Map.Entry::getKey)
+                .limit(n)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -61,7 +74,10 @@ public class LibraryService {
      * @return 평균 책 나이
      */
     public double getAverageBookAge() {
-        return 0;
+        return books.stream()
+                .mapToLong(book -> LocalDate.now().getYear() - book.getPublishDate().getYear())
+                .average()
+                .orElse(0);
     }
 
     /**
@@ -71,7 +87,10 @@ public class LibraryService {
      * @return 최근 책들의 리스트
      */
     public List<Book> getRecentBooks(int n) {
-        return null;
+        return books.stream()
+                .sorted(Comparator.comparing(Book::getPublishDate).reversed())
+                .limit(n)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -80,7 +99,14 @@ public class LibraryService {
      * @return 대출 성공 여부
      */
     public boolean lendBook(String isbn) {
-        return false;
+        return books.stream()
+                .filter(book -> book.getIsbn().equals(isbn) && book.isAvailable())
+                .findFirst()
+                .map(book -> {
+                    book.setAvailable(false);
+                    return true;
+                })
+                .orElse(false);
     }
 
     /**
@@ -88,7 +114,10 @@ public class LibraryService {
      * @param isbn 반납할 책의 ISBN 번호
      */
     public void returnBook(String isbn) {
-
+        books.stream()
+                .filter(book -> book.getIsbn().equals(isbn))
+                .findFirst()
+                .ifPresent(book -> book.setAvailable(true));
     }
 
     /**
@@ -96,7 +125,8 @@ public class LibraryService {
      * @return 대출 가능 여부에 따른 책들의 맵
      */
     public Map<Boolean, List<Book>> partitionBooksByAvailability() {
-        return null;
+        return books.stream()
+                .collect(Collectors.partitioningBy(Book::isAvailable));
     }
 
     /**
@@ -105,9 +135,14 @@ public class LibraryService {
      * @return 가장 많은 책을 출판한 저자
      */
     public String getMostProlificAuthor() {
-        return null;
+        return books.stream()
+                .collect(Collectors.groupingBy(Book::getAuthor, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
     }
-
 
     /**
      * 10. 책 제목들의 총 길이를 계산합니다.
@@ -115,7 +150,9 @@ public class LibraryService {
      * @return 책 제목의 총 길이
      */
     public int getTotalTitleLength() {
-        return 0;
+        return books.stream()
+                .mapToInt(book -> book.getTitle().length())
+                .sum();
     }
 
     /**
@@ -126,14 +163,15 @@ public class LibraryService {
         books.forEach(processor::process);
     }
 
-
     /**
      * 12. BookValidator를 사용하여 책을 검증합니다.
      * @param validator 책을 검증할 Validator
      * @return 검증된 책 리스트
      */
     public List<Book> getValidBooks(BookValidator validator) {
-        return null;
+        return books.stream()
+                .filter(validator::validate)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -143,7 +181,9 @@ public class LibraryService {
      * @return 변환된 결과 리스트
      */
     public <T> List<T> transformBooks(BookTransformer<T> transformer) {
-        return null;
+        return books.stream()
+                .map(transformer::transform)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -151,7 +191,8 @@ public class LibraryService {
      * @param bookSupplier 새 책을 생성할 Supplier
      */
     public void addNewBook(Supplier<Book> bookSupplier) {
-
+        Book newBook = bookSupplier.get();
+        addBook(newBook);
     }
 
     /**
@@ -160,7 +201,9 @@ public class LibraryService {
      * @return 찾은 책 (Optional로 감싸진 값)
      */
     public Optional<Book> findBookByIsbn(String isbn) {
-        return null;
+        return books.stream()
+                .filter(book -> book.getIsbn().equals(isbn))
+                .findFirst();
     }
 
     /**
@@ -172,7 +215,7 @@ public class LibraryService {
      * @return 비교 결과
      */
     public <T> T compareBooks(Book book1, Book book2, BiFunction<Book, Book, T> comparator) {
-        return null;
+        return comparator.apply(book1, book2);
     }
 
     /**
@@ -182,8 +225,9 @@ public class LibraryService {
      */
     public void updateBookState(String isbn, UnaryOperator<Book> updater) {
         findBookByIsbn(isbn).ifPresent(book -> {
-            // TODO: 이 부분을 채워주세요
+            Book updatedBook = updater.apply(book);
+            books.remove(book);
+            books.add(updatedBook);
         });
     }
-
 }
