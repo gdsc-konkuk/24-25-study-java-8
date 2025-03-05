@@ -5,7 +5,6 @@ import org.speculatingwook.library.book.BookTransformer;
 import org.speculatingwook.library.book.BookValidator;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -14,8 +13,6 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import static java.time.temporal.ChronoField.EPOCH_DAY;
-import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 
 public class LibraryService {
     private List<Book> books = new ArrayList<>();
