@@ -2,6 +2,7 @@ package org.speculatingwook.cinema;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -293,6 +294,83 @@ public class MovieService {
     public Map<String, List<String>> groupMovieTitlesByDirector() {
         return null;
     }
+
+    // ========================================================
+    // F. Supplier (10개)
+    // ========================================================
+
+    /** Supplier #1: 기본 Movie 반환 (기본 영화 객체를 생성하는 Supplier를 사용) */
+    public Movie getDefaultMovie() {
+        return null;
+    }
+
+    private final Supplier<Movie> defaultMovieSupplier = () ->
+            new Movie("Default", "Unknown", 2000, 3.0, 120, "Default Director", 0);
+
+    /** Supplier #2: 새 Movie를 생성하는 Supplier 반환
+     * title: New Movie
+     * genre: "Genre"
+     * rating: 4.0
+     * duration: 100
+     * director: Some Director
+     * box office: 100000000
+     * */
+    public Supplier<Movie> getMovieSupplier() {
+        return null;
+    }
+
+    /** Supplier #3: 현재 영화 목록에서 무작위 Movie를 반환하는 Supplier
+     * - java util의 Random 사용
+     * */
+    public Supplier<Movie> getRandomMovieSupplier() {
+        return () -> {
+            return null;
+        };
+    }
+
+    /** Supplier #4: 현재 영화 목록을 반환하는 Supplier
+     * 힌트: 기존에 작성하였던 함수를 활용해보자.
+     * */
+    public Supplier<List<Movie>> getMoviesSupplier() {
+        return null;
+    }
+
+    /** Supplier #5: Optional.orElseGet()를 활용하여 영화 반환, 없으면 기본 영화 반환 */
+    public Movie getMovieOrDefault(Optional<Movie> opt) {
+        return null;
+    }
+
+    /** Supplier #6: 지연 평가 방식으로 영화 생성 (Supplier를 전달받아 필요할 때 영화 생성) */
+    public Movie lazyMovieCreation(java.util.function.Supplier<Movie> supplier) {
+        return null;
+    }
+
+    /** Supplier #7: 기본 감독 이름을 반환하는 Supplier */
+    public Supplier<String> supplyDefaultDirector() {
+        return null;
+    }
+
+    /** Supplier #8: 전체 영화의 평균 평점을 Supplier로 반환
+     * 힌트: 기존에 작성하였던 함수를 활용해보자.
+     * */
+    public Supplier<Double> supplyAverageRatingSupplier() {
+        return null;
+    }
+
+    /** Supplier #9: 전체 영화의 총 흥행수익을 Supplier로 반환
+     * 힌트: 기존에 작성하였던 함수를 활용해보자.
+     * */
+    public Supplier<Long> supplyTotalBoxOfficeSupplier() {
+        return null;
+    }
+
+    /** Supplier #10: 제목 오름차순으로 정렬된 영화 목록을 Supplier로 반환
+     * 힌트: 기존에 작성하였던 함수를 활용해보자.
+     * */
+    public Supplier<List<Movie>> supplySortedMoviesSupplier() {
+        return null;
+    }
+
 
     // 추가: 전체 영화 목록 반환 (방어적 복사)
     public List<Movie> getMovies() {

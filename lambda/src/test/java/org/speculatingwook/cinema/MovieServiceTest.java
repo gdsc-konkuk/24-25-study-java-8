@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.speculatingwook.cinema.Movie;
 import org.speculatingwook.cinema.MovieService;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -377,4 +374,82 @@ public class MovieServiceTest {
         Map<String, List<String>> groups = movieService.groupMovieTitlesByDirector();
         assertEquals(3, groups.get("Christopher Nolan").size());
     }
+
+
+
+    // ========================================================
+    // F. Supplier Tests (10개)
+    // ========================================================
+
+    @Test
+    public void testSupplier1_getDefaultMovie() {
+        // Supplier #1: 기본 영화의 제목은 "Default"여야 함.
+        Movie defaultMovie = movieService.getDefaultMovie();
+        assertEquals("Default", defaultMovie.getTitle());
+    }
+
+    @Test
+    public void testSupplier2_getMovieSupplier() {
+        // Supplier #2: 새 영화 생성 Supplier를 통해 생성된 영화의 제목은 "New Movie"여야 함.
+        Movie newMovie = movieService.getMovieSupplier().get();
+        assertEquals("New Movie", newMovie.getTitle());
+    }
+
+    @Test
+    public void testSupplier3_getRandomMovieSupplier() {
+        // Supplier #3: 현재 영화 목록에서 무작위 영화 반환; null이 아니어야 함.
+        Movie randomMovie = movieService.getRandomMovieSupplier().get();
+        assertNotNull(randomMovie);
+    }
+
+    @Test
+    public void testSupplier4_getMoviesSupplier() {
+        // Supplier #4: 영화 목록 Supplier가 반환하는 리스트의 크기는 실제 영화 목록과 같아야 함.
+        List<Movie> moviesList = movieService.getMoviesSupplier().get();
+        assertEquals(movieService.getMovies().size(), moviesList.size());
+    }
+
+    @Test
+    public void testSupplier5_getMovieOrDefault() {
+        // Supplier #5: 빈 Optional이 전달되면 기본 영화("Default")를 반환해야 함.
+        Movie movie = movieService.getMovieOrDefault(Optional.empty());
+        assertEquals("Default", movie.getTitle());
+    }
+
+    @Test
+    public void testSupplier6_lazyMovieCreation() {
+        // Supplier #6: 전달된 Supplier를 통해 "Lazy Movie" 생성
+        Movie lazyMovie = movieService.lazyMovieCreation(() ->
+                new Movie("Lazy Movie", "Drama", 2021, 4.2, 130, "Lazy Director", 50_000_000));
+        assertEquals("Lazy Movie", lazyMovie.getTitle());
+    }
+
+    @Test
+    public void testSupplier7_supplyDefaultDirector() {
+        // Supplier #7: 기본 감독 이름은 "Default Director"여야 함.
+        String director = movieService.supplyDefaultDirector().get();
+        assertEquals("Default Director", director);
+    }
+
+    @Test
+    public void testSupplier8_supplyAverageRatingSupplier() {
+        // Supplier #8: 전체 영화의 평균 평점이 0보다 커야 함.
+        double avgRating = movieService.supplyAverageRatingSupplier().get();
+        assertTrue(avgRating > 0);
+    }
+
+    @Test
+    public void testSupplier9_supplyTotalBoxOfficeSupplier() {
+        // Supplier #9: 전체 영화의 총 흥행수익이 0보다 커야 함.
+        long totalBoxOffice = movieService.supplyTotalBoxOfficeSupplier().get();
+        assertTrue(totalBoxOffice > 0);
+    }
+
+    @Test
+    public void testSupplier10_supplySortedMoviesSupplier() {
+        // Supplier #10: 제목 오름차순 정렬된 영화 목록의 첫 번째 영화가 "Avengers: Endgame"이어야 함.
+        List<Movie> sortedMovies = movieService.supplySortedMoviesSupplier().get();
+        assertEquals("Avengers: Endgame", sortedMovies.get(0).getTitle());
+    }
+
 }
