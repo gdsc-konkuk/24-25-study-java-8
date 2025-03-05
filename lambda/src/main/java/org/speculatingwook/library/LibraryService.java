@@ -155,9 +155,13 @@ public class LibraryService {
     public int getTotalTitleLength() {
 //        return books.stream()
 //                .collect(summingInt(book->book.getTitle().length()));
+//        return books.stream()
+//                .map(book -> book.getTitle().length())
+//                .reduce(0, Integer::sum);
         return books.stream()
-                .map(book -> book.getTitle().length())
-                .reduce(0, Integer::sum);
+                .mapToInt(book->book.getTitle().length())
+                .sum();
+
     }
 
     /**
